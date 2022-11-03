@@ -1,0 +1,36 @@
+version: '3'
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    volumes:
+      - mysql-data:/var/lib/mysql:rw
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: app_db
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: secret
+    ports:
+      - 3306:3306
+
+  app:
+    build: .
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    volumes:
+      - .:/app
+      - bundle-path:/bundle
+    ports:
+      - 8000:3000
+    depends_on:
+      - db
+    environment:
+      BUNDLE_PATH: /bundle/vendor
+      DB_NAME: app_db
+      DB_USER: root
+      DB_PASS: secret
+      DB_HOST: db
+
+
+volumes:
+  mysql-data:
+  bundle-path:
